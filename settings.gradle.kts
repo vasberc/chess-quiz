@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "ChessQuiz"
 include(":app")
- 
+include(":presentation")
