@@ -1,29 +1,15 @@
 plugins {
-    alias(libs.plugins.androidApplication)
+    id("com.android.library")
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = "com.vasberc.chessquiz"
+    namespace = "com.vasberc.data_local"
     compileSdk = 34
 
-    //For KSP to access generated code
-    applicationVariants.configureEach {
-        kotlin.sourceSets {
-            getByName(name) {
-                kotlin.srcDir("build/generated/ksp/${name}/kotlin")
-            }
-        }
-    }
-
     defaultConfig {
-        applicationId = "com.vasberc.chessquiz"
-        minSdk = 26
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
-
+        minSdk = 24
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -50,10 +36,10 @@ ksp {
 }
 
 dependencies {
-    implementation(project(":presentation"))
-    implementation(project(":data_local"))
     ksp(libs.koinKsp)
+    ksp(libs.roomKsp)
     implementation(libs.bundles.core)
+    implementation(libs.bundles.dataLocal)
     testImplementation(libs.bundles.testing)
     androidTestImplementation(libs.bundles.androidTesting)
 }

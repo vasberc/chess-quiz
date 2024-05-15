@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "ChessQuiz"
 include(":app")
 include(":presentation")
+include(":data_local")
