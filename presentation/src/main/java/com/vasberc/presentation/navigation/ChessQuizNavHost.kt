@@ -9,6 +9,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.vasberc.presentation.screens.BoardScreen
 import com.vasberc.presentation.screens.LauncherScreen
 
 @Composable
@@ -24,7 +25,10 @@ fun ChessQuizNavHost(
         }
 
         composable(ChessQuizRoutes.BoardScreen.route, ChessQuizRoutes.BoardScreen.arguments) {
-
+            BoardScreen(
+                navController = navController,
+                onShowMessage = onMessage
+            )
         }
     }
 }

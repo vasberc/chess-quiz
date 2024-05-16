@@ -28,7 +28,6 @@ fun HomeScreen() {
 
     val navController = rememberNavController()
 
-
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -48,8 +47,6 @@ fun HomeScreen() {
                 }
             )
         }
-
-
 
         val coroutineScope = rememberCoroutineScope()
         LaunchedEffect(message) {
