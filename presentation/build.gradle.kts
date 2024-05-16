@@ -47,12 +47,14 @@ android {
     }
 }
 
-ksp {
-    arg("KOIN_CONFIG_CHECK", "true")
-}
+//Commented out because the presentation module cant see the data_local module
+//and at the moment the koin cannot understand at compile time that the interfaces in presentation module will be
+//resolved at run time by the data_local module
+//ksp {
+//    arg("KOIN_CONFIG_CHECK", "true")
+//}
 
 dependencies {
-//    implementation(project(":data_local"))
     implementation(platform(libs.androidx.compose.bom))
     ksp(libs.koinKsp)
     implementation(libs.bundles.core)

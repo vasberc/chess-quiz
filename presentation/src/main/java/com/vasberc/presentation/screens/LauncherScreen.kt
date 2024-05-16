@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.vasberc.presentation.R
 import com.vasberc.presentation.componets.BackgroundComposable
@@ -31,7 +33,11 @@ fun LauncherScreen(
     navController: NavHostController,
     viewModel: LauncherScreenViewModel = getViewModel()
 ) {
-    LauncherScreenContent(isResumeEnabled = false) { resume: Boolean ->
+    val isResumeEnable = viewModel.isResumeEnabled.collectAsStateWithLifecycle(
+        initialValue = false,
+        lifecycleOwner = LocalLifecycleOwner.current
+    ).value
+    LauncherScreenContent(isResumeEnabled = isResumeEnable) { resume: Boolean ->
         navController.navigate(
             ChessQuizRoutes.BoardScreen.route
                 .replace(
