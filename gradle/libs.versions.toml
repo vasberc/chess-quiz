@@ -19,6 +19,7 @@ coroutines = "1.7.1"
 composeNavigation = "2.7.7"
 koinCompose = "3.4.6"
 constraintCompose = "1.0.1"
+lifecycleRuntimeComposeAndroid = "2.8.0"
 
 [libraries]
 #core
@@ -41,6 +42,7 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-lifecycle-runtime-compose-android = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose-android", version.ref = "lifecycleRuntimeComposeAndroid" }
 #data_local
 roomRuntime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 roomKtx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
@@ -58,7 +60,7 @@ presentation = [
     "androidx-lifecycle-runtime-ktx", "androidx-activity-compose", "androidx-ui",
     "androidx-ui-graphics", "androidx-ui-tooling-preview", "androidx-material3",
     "androidx-appcompat", "material", "androidx-compose-navigation",
-    "koi-compose", "androidx-constraint-layout-compose"
+    "koi-compose", "androidx-constraint-layout-compose", "androidx-lifecycle-runtime-compose-android"
 ]
 presentationDebug = ["androidx-ui-tooling", "androidx-ui-test-manifest"]
 dataLocal = ["roomRuntime", "roomKtx"]
