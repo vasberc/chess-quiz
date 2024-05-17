@@ -7,9 +7,12 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
@@ -17,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import com.vasberc.presentation.R
+import com.vasberc.presentation.componets.AnimateVisibilityY
 import com.vasberc.presentation.componets.BackgroundComposable
 import com.vasberc.presentation.componets.LoadingSpinnerWithMask
 import com.vasberc.presentation.componets.UserOptionsPopUp
@@ -50,7 +54,8 @@ fun BoardScreen(
     BackHandler(enabled = isLoading) { }
 
     BoardScreenContent(
-        session
+        session = session,
+        setSession = { viewModel.setSession(it) }
     ) {
         navController.popBackStack()
     }
@@ -63,26 +68,12 @@ fun BoardScreen(
 @Composable
 fun BoardScreenContent(
     session: Session?,
+    setSession: (session: Session) -> Unit,
     onNavigateBack: () -> Unit
 ) {
-    AnimatedVisibility(
-        enter = slideInVertically(
-            initialOffsetY = {
-                //To start out of the screen the offset is set to the height of the component +
-                //the padding value
-                it
-            },
-        ),
-        exit = slideOutVertically(
-            targetOffsetY = {
-                //Same with initial starting logic to go out of the screen
-                it
-            },
-        ),
-        visible = session == null
-    ) {
+    AnimateVisibilityY(isVisible = session == null) {
         UserOptionsPopUp {
-
+            setSession(it)
         }
     }
 }
@@ -100,7 +91,7 @@ fun BoardScreenPreview() {
 
     ) {
         BackgroundComposable {
-            BoardScreenContent(null){}
+            BoardScreenContent(null, {}){}
         }
     }
 }

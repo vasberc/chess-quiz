@@ -94,7 +94,7 @@ fun LauncherScreenContent(
                 end.linkTo(newButton.end)
                 width = Dimension.fillToConstraints
             },
-            onClick = { onBoardScreen(false) },
+            onClick = { onBoardScreen(true) },
             enabled = isResumeEnabled
         ) {
             Text(
