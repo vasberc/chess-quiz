@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -22,14 +21,12 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import com.vasberc.presentation.R
 import com.vasberc.presentation.componets.BackgroundComposable
 import com.vasberc.presentation.navigation.ChessQuizRoutes
 import com.vasberc.presentation.viewmodels.LauncherScreenViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.newCoroutineContext
 import org.koin.androidx.compose.getViewModel
 
 @Composable

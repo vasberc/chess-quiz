@@ -1,8 +1,8 @@
 package com.vasberc.presentation.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -39,7 +39,7 @@ fun HomeScreen() {
         BackgroundComposable {
             ChessQuizNavHost(
                 modifier = Modifier
-                    .padding(paddingValues)
+                    .consumeWindowInsets(paddingValues)
                     .background(Color.Transparent),
                 navController =  navController,
                 onMessage = { messageToShow ->
