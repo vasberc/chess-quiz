@@ -5,4 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface SessionRepo {
     fun getSessionFlow(): Flow<Session?>
+
+    suspend fun saveSession(session: Session?)
 }

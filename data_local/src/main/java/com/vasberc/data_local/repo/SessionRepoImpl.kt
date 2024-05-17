@@ -1,6 +1,7 @@
 package com.vasberc.data_local.repo
 
 import com.vasberc.data_local.dao.SessionDao
+import com.vasberc.data_local.entity.asEntity
 import com.vasberc.presentation.model.Session
 import com.vasberc.presentation.repo.SessionRepo
 import kotlinx.coroutines.flow.Flow
@@ -15,4 +16,11 @@ class SessionRepoImpl(
         return sessionDao.getSessionFlow().map { it?.asModel() }
     }
 
+    override suspend fun saveSession(session: Session?) {
+        if(session != null) {
+            sessionDao.saveSession(session.asEntity())
+        } else {
+            sessionDao.clearSession()
+        }
+    }
 }

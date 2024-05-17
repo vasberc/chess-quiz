@@ -9,11 +9,13 @@ import com.vasberc.presentation.model.Session
 data class SessionEntity(
     @PrimaryKey
     val id: Int = 1,
-    val boardSize: Int
+    val boardSize: Int,
+    val maxMoves: Int
 ): ModelInterface<Session> {
     override fun asModel(): Session {
         return Session(
-            boardSize = boardSize
+            boardSize = boardSize,
+            maxMoves = maxMoves
         )
     }
 
@@ -21,6 +23,7 @@ data class SessionEntity(
 
 fun Session.asEntity(): SessionEntity {
     return SessionEntity(
-        boardSize = boardSize
+        boardSize = boardSize,
+        maxMoves = maxMoves
     )
 }
