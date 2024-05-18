@@ -14,4 +14,8 @@ class Box(
     }
 
     fun getHasHorse() = hasHorse
+
+    override fun toString(): String {
+        return "($x, $y)"
+    }
 }
