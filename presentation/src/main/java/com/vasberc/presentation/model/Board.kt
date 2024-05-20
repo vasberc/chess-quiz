@@ -1,10 +1,10 @@
 package com.vasberc.presentation.model
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-class Board(private val size: Int) {
+class Board(session: Session) {
 
+    private val size: Int = session.boardSize
     private var boxes: List<Box>
 
     init {
@@ -15,9 +15,14 @@ class Board(private val size: Int) {
                     Box(
                         color = if((y + x) % 2 == 0) Color.White else Color.Black,
                         x = x,
-                        y = y,
-                        hasHorse = false
-                    )
+                        y = y
+                    ).also {
+                        if(session.horseBox?.first == x && session.horseBox.second == y) {
+                            it.setHasHorse(true)
+                        } else if(session.targetBox?.first == x && session.targetBox.second == y) {
+                            it.setIsTarget(true)
+                        }
+                    }
                 )
             }
         }

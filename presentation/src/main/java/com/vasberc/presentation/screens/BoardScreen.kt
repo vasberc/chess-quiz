@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -94,11 +95,11 @@ fun BoardScreenContent(
     if(session != null) {
         val board by remember {
             mutableStateOf(
-                Board(session.boardSize)
+                Board(session)
             )
         }
 
-        var boxes by remember {
+        val boxes by remember {
             mutableStateOf(board.getBoxes())
         }
 
@@ -107,8 +108,12 @@ fun BoardScreenContent(
             mutableStateOf(25.dp)
         }
 
-        val enableClick by remember {
-            derivedStateOf { boxes.none { it.getHasHorse() } }
+        val horseExists by remember(session) {
+            derivedStateOf { boxes.any { it.getHasHorse() } }
+        }
+
+        val enableClick by remember(session) {
+            derivedStateOf { !horseExists || boxes.none { it.getIsTarget() } }
         }
 
         LazyHorizontalGrid(
@@ -138,9 +143,19 @@ fun BoardScreenContent(
                                 .background(
                                     item.color
                                 )
-                                .clickable(enabled = enableClick) {
-                                    item.setHasHorse(true)
-                                    //todo
+                                .clickable(enabled = enableClick && !item.getHasHorse()) {
+                                    val newSession = if (horseExists) {
+                                        item.setIsTarget(true)
+                                        session.copy(
+                                            targetBox = Pair(item.x, item.y)
+                                        )
+                                    } else {
+                                        item.setHasHorse(true)
+                                        session.copy(
+                                            horseBox = Pair(item.x, item.y)
+                                        )
+                                    }
+                                    setSession(newSession)
                                 }
                         ) {
                             if(item.getHasHorse()) {
@@ -148,6 +163,13 @@ fun BoardScreenContent(
                                     modifier = Modifier.fillMaxSize(),
                                     painter = painterResource(id = R.drawable.ic_chess_horse),
                                     contentDescription = "Horse",
+                                    contentScale = ContentScale.FillBounds
+                                )
+                            } else if (item.getIsTarget()) {
+                                Image(
+                                    modifier = Modifier.fillMaxSize(),
+                                    painter = painterResource(id = R.drawable.ic_target),
+                                    contentDescription = "Target",
                                     contentScale = ContentScale.FillBounds
                                 )
                             }
