@@ -16,7 +16,6 @@ fun BackgroundComposable(
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
-            .safeContentPadding()
             .paint(
                 painter = painterResource(id = R.drawable.ic_chess),
                 contentScale = ContentScale.Crop
