@@ -10,12 +10,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.vasberc.presentation.screens.LauncherScreen
+import com.vasberc.presentation.uimodels.SnackbarMessage
 
 @Composable
 fun ChessQuizNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    onMessage: (message: String) -> Unit
+    onMessage: (message: SnackbarMessage) -> Unit
 ) {
 
     NavHost(navController = navController,  startDestination = ChessQuizRoutes.LauncherScreen.route, modifier = modifier) {

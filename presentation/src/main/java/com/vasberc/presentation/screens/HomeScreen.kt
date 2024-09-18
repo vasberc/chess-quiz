@@ -19,12 +19,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.rememberNavController
 import com.vasberc.presentation.componets.BackgroundComposable
 import com.vasberc.presentation.navigation.ChessQuizNavHost
+import com.vasberc.presentation.uimodels.SnackbarMessage
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen() {
 
-    var message by remember { mutableStateOf<String?>(null) }
+    var message by remember { mutableStateOf<SnackbarMessage?>(null) }
 
     val navController = rememberNavController()
 
@@ -56,7 +57,9 @@ fun HomeScreen() {
             coroutineScope.launch {
                 if(message != null) {
                     snackbarHostState.currentSnackbarData?.dismiss()
-                    snackbarHostState.showSnackbar(message = message!!, duration = SnackbarDuration.Long)
+                    val text = message!!.message
+                    val duration = message!!.duration
+                    snackbarHostState.showSnackbar(message = text, duration = duration)
                     message = null
                 }
             }
