@@ -12,6 +12,7 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,16 +25,16 @@ import com.vasberc.presentation.R
 import com.vasberc.presentation.componets.BackgroundComposable
 import com.vasberc.presentation.navigation.ChessQuizRoutes
 import com.vasberc.presentation.viewmodels.LauncherScreenViewModel
-import org.koin.androidx.compose.getViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LauncherScreen(
     navController: NavHostController,
-    viewModel: LauncherScreenViewModel = getViewModel()
+    viewModel: LauncherScreenViewModel = koinViewModel()
 ) {
     LauncherScreenContent(isResumeEnabled = false) { resume: Boolean ->
         navController.navigate(
-            ChessQuizRoutes.BoardScreen(false)
+            ChessQuizRoutes.BoardScreen(resume)
         )
     }
 }
@@ -69,7 +70,7 @@ fun LauncherScreenContent(
             onClick = { onBoardScreen(false) }
         ) {
             Text(
-                text = "Start new session",
+                text = stringResource(R.string.start_new_game),
                 style = TextStyle(fontSize = 14.sp)
             )
         }
@@ -86,7 +87,7 @@ fun LauncherScreenContent(
             enabled = isResumeEnabled
         ) {
             Text(
-                text = "Resume",
+                text = stringResource(R.string.resume),
                 style = TextStyle(fontSize = 14.sp)
             )
         }

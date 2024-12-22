@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">ChessQuiz</string>
+    <string name="start_new_game">Start new game</string>
+    <string name="resume">Resume</string>
+    <string name="select_preferences">Select game preferences</string>
+    <string name="insert_max_moves">Insert moves</string>
+    <string name="insert_board_size">Insert board size</string>
+    <string name="ok">Ok</string>
+    <string name="invalid_config">Please enter number of moves(any) and board size to continue(from 6 to 16).</string>
+    <string name="calculatePaths">Calc possible paths</string>
 </resources>

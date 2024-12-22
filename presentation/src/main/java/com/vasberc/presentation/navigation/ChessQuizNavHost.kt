@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.vasberc.presentation.screens.BoardScreen
 import com.vasberc.presentation.screens.LauncherScreen
 import com.vasberc.presentation.uimodels.SnackbarMessage
 import kotlinx.serialization.Serializable
@@ -22,7 +23,7 @@ fun ChessQuizNavHost(
         }
 
         composable<ChessQuizRoutes.BoardScreen> {
-
+            BoardScreen(navController = navController, onMessage = onMessage)
         }
     }
 }
