@@ -33,11 +33,7 @@ fun LauncherScreen(
 ) {
     LauncherScreenContent(isResumeEnabled = false) { resume: Boolean ->
         navController.navigate(
-            ChessQuizRoutes.BoardScreen.route
-                .replace(
-                    "{isResume}",
-                    resume.toString()
-                )
+            ChessQuizRoutes.BoardScreen(false)
         )
     }
 }
