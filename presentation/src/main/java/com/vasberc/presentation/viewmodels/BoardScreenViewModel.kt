@@ -103,12 +103,16 @@ class BoardScreenViewModel(
         val horse = _sessionConfig.value?.board?.horse
         horse?.let {
             _calculating.update { true }
+            _paths.update { null }
             viewModelScope.launch(Dispatchers.Default) {
                 it.getMoves(_sessionConfig.value!!.board).forEach { box ->
                     checkAndContinue(listOf(box))
                 }
                 Timber.d("finished paths=${paths.value} \n pathsSize = ${paths.value?.size}")
                 _calculating.update { false }
+                if (_paths.value.isNullOrEmpty()) {
+                    _paths.update { listOf() }
+                }
             }
         }
     }

@@ -30,10 +30,12 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun TextWithAnimatedRing(
     counter: Int,
+    calculating: Boolean,
     onClick: () -> Unit
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "")
-    val rotateAnimation = infiniteTransition.animateFloat(
+
+    val infiniteTransition = if (calculating) rememberInfiniteTransition(label = "") else null
+    val rotateAnimation = infiniteTransition?.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
@@ -60,17 +62,26 @@ fun TextWithAnimatedRing(
                 val center = Offset(size.width / 2, size.height / 2)
                 val strokeWidth = 10f
                 drawCircle(Color.White)
-                rotate(degrees = rotateAnimation.value) {
-                    drawArc(
-                        brush = Brush.sweepGradient(rainbowColors),
-                        startAngle = 0f,
-                        sweepAngle = 360f,
-                        useCenter = false,
-                        topLeft = Offset(center.x - radius, center.y - radius),
-                        size = Size(radius * 2, radius * 2),
+                rotateAnimation?.value?.let { degrees ->
+                    rotate(degrees = degrees) {
+                        drawArc(
+                            brush = Brush.sweepGradient(rainbowColors),
+                            startAngle = 0f,
+                            sweepAngle = 360f,
+                            useCenter = false,
+                            topLeft = Offset(center.x - radius, center.y - radius),
+                            size = Size(radius * 2, radius * 2),
+                            style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                        )
+                    }
+                } ?: run {
+                    drawCircle(
+                        color = Color.Black,
+                        radius = radius,
                         style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                     )
                 }
+
 
             }
             .clip(CircleShape)
@@ -83,5 +94,5 @@ fun TextWithAnimatedRing(
 @Preview(showBackground = true, backgroundColor = 0xFF625b71)
 @Composable
 fun PreviewTextWithAnimatedRing() {
-    TextWithAnimatedRing(100, {})
+    TextWithAnimatedRing(100, false, {})
 }

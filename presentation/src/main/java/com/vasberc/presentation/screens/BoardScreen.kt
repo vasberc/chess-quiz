@@ -51,6 +51,7 @@ import androidx.navigation.NavHostController
 import com.vasberc.presentation.R
 import com.vasberc.presentation.componets.BackgroundComposable
 import com.vasberc.presentation.componets.BottomSheet
+import com.vasberc.presentation.componets.PathsDialog
 import com.vasberc.presentation.componets.TextWithAnimatedRing
 import com.vasberc.presentation.componets.clickableWithColor
 import com.vasberc.presentation.componets.dragAndDropTargetElement
@@ -79,7 +80,7 @@ fun BoardScreen(
         onItemDropped = viewModel::onItemDropped,
         onConfigComplete = viewModel::setSessionConfig,
         onCalculateClicked = viewModel::onCalculateClicked,
-        possiblePaths = possiblePaths?.size
+        possiblePaths = possiblePaths
     )
 }
 
@@ -92,7 +93,7 @@ fun BoardScreenContent(
     onItemDropped: (index: Int, isHorse: Boolean) -> Unit,
     onConfigComplete: (sessionConfig: SessionConfig) -> Unit,
     onCalculateClicked: () -> Unit,
-    possiblePaths: Int?
+    possiblePaths: List<List<Box>>?
 ) {
     if (sessionConfig == null) {
         BottomSheet(onConfigComplete)
@@ -106,6 +107,7 @@ fun BoardScreenContent(
             val (board, calcButton, counter) = createRefs()
             val verticalScrollState = rememberScrollState()
             val horizontalScrollState = rememberScrollState()
+            var dialogVisible by remember { mutableStateOf(false) }
 
             ContextualFlowRow(
                 itemCount = sessionConfig.board.boxes.size,
@@ -221,8 +223,10 @@ fun BoardScreenContent(
                     end.linkTo(board.end)
                 }
             ) {
-                TextWithAnimatedRing(possiblePaths ?: 0) {
-
+                TextWithAnimatedRing(counter = possiblePaths?.size ?: 0, calculating = calculating) {
+                    if (!possiblePaths.isNullOrEmpty()) {
+                        dialogVisible = true
+                    }
                 }
             }
 
@@ -248,8 +252,13 @@ fun BoardScreenContent(
                     Text(text = stringResource(R.string.calculatePaths))
                 }
             }
-        }
 
+            PathsDialog(
+                onDismissRequest = { dialogVisible = false },
+                paths = possiblePaths ?: listOf(),
+                isVisible = dialogVisible
+            )
+        }
     }
 }
 
@@ -273,7 +282,7 @@ fun BoardScreenPreview() {
                 onItemDropped = { i, b -> },
                 onConfigComplete = {},
                 onCalculateClicked = {},
-                possiblePaths = 1
+                possiblePaths = listOf()
             )
         }
     }

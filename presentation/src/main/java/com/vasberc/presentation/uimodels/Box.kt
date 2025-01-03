@@ -39,4 +39,8 @@ data class Box(
             y = y
         )
     }
+
+    override fun toString(): String {
+        return "{$x,$y}"
+    }
 }
