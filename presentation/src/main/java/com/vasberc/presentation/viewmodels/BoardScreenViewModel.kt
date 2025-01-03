@@ -122,7 +122,7 @@ class BoardScreenViewModel(
                 return@coroutineScope
             }
 
-            if (path.last() == sessionConfig.value?.board?.target) {
+            if (path.size == sessionConfig.value?.board?.moves && path.last() == sessionConfig.value?.board?.target) {
                 //add the path to the succeed paths
                 _paths.update { currentValue ->
                     currentValue?.let {
