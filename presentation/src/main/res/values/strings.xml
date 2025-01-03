@@ -10,4 +10,5 @@
     <string name="calculatePaths">Calc possible paths</string>
     <string name="calculating">Calculating paths</string>
     <string name="counter">Found\n%1$d\npaths</string>
+    <string name="paths_found">Paths found</string>
 </resources>

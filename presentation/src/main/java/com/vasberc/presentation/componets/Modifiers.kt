@@ -44,6 +44,7 @@ fun Modifier.dragAndDropTargetElement(
     val dndTarget = remember(sessionConfig) {
         object : DragAndDropTarget {
             override fun onDrop(event: DragAndDropEvent): Boolean {
+                onBackgroundChange(null)
                 val draggedData = event.toAndroidDragEvent()
                     .clipData.getItemAt(0).text
                 if (draggedData.toString() == sessionConfig.board.horse.toString()) {
