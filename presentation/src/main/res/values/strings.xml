@@ -5,8 +5,9 @@
     <string name="select_preferences">Select game preferences</string>
     <string name="insert_max_moves">Insert moves</string>
     <string name="insert_board_size">Insert board size</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="invalid_config">Please enter number of moves(any) and board size to continue(from 6 to 16).</string>
     <string name="calculatePaths">Calc possible paths</string>
     <string name="calculating">Calculating paths</string>
+    <string name="counter">Found\n%1$d\npaths</string>
 </resources>

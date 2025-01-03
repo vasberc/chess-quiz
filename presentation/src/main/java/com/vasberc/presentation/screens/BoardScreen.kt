@@ -1,6 +1,7 @@
 package com.vasberc.presentation.screens
 
 import android.content.ClipData
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -50,6 +51,7 @@ import androidx.navigation.NavHostController
 import com.vasberc.presentation.R
 import com.vasberc.presentation.componets.BackgroundComposable
 import com.vasberc.presentation.componets.BottomSheet
+import com.vasberc.presentation.componets.TextWithAnimatedRing
 import com.vasberc.presentation.componets.clickableWithColor
 import com.vasberc.presentation.componets.dragAndDropTargetElement
 import com.vasberc.presentation.uimodels.Board
@@ -68,6 +70,7 @@ fun BoardScreen(
 
     val sessionConfig = viewModel.sessionConfig.collectAsStateWithLifecycle().value
     val calculating = viewModel.calculating.collectAsStateWithLifecycle().value
+    val possiblePaths = viewModel.paths.collectAsStateWithLifecycle().value
 
     BoardScreenContent(
         sessionConfig = sessionConfig,
@@ -75,7 +78,8 @@ fun BoardScreen(
         onBoxClicked = viewModel::onBoxClicked,
         onItemDropped = viewModel::onItemDropped,
         onConfigComplete = viewModel::setSessionConfig,
-        onCalculateClicked = viewModel::onCalculateClicked
+        onCalculateClicked = viewModel::onCalculateClicked,
+        possiblePaths = possiblePaths?.size
     )
 }
 
@@ -87,7 +91,8 @@ fun BoardScreenContent(
     onBoxClicked: (index: Int) -> Unit,
     onItemDropped: (index: Int, isHorse: Boolean) -> Unit,
     onConfigComplete: (sessionConfig: SessionConfig) -> Unit,
-    onCalculateClicked: () -> Unit
+    onCalculateClicked: () -> Unit,
+    possiblePaths: Int?
 ) {
     if (sessionConfig == null) {
         BottomSheet(onConfigComplete)
@@ -98,7 +103,7 @@ fun BoardScreenContent(
                 .background(Color.White.copy(alpha = 0.8f))
                 .fillMaxSize()
         ) {
-            val (board, calcButton) = createRefs()
+            val (board, calcButton, counter) = createRefs()
             val verticalScrollState = rememberScrollState()
             val horizontalScrollState = rememberScrollState()
 
@@ -207,6 +212,20 @@ fun BoardScreenContent(
                 }
             }
 
+            AnimatedVisibility(
+                visible = possiblePaths != null,
+                modifier = Modifier.constrainAs(counter) {
+                    top.linkTo(board.top)
+                    bottom.linkTo(board.bottom)
+                    start.linkTo(board.start)
+                    end.linkTo(board.end)
+                }
+            ) {
+                TextWithAnimatedRing(possiblePaths ?: 0) {
+
+                }
+            }
+
             Button(
                 modifier = Modifier
                     .constrainAs(calcButton) {
@@ -253,7 +272,8 @@ fun BoardScreenPreview() {
                 onBoxClicked = {},
                 onItemDropped = { i, b -> },
                 onConfigComplete = {},
-                onCalculateClicked = {}
+                onCalculateClicked = {},
+                possiblePaths = 1
             )
         }
     }
