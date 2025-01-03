@@ -18,4 +18,8 @@ data class Board(
         Box(x, y)
     }
 
+    fun isValidBox(box: Box): Boolean {
+        return box.x in 0 until boardSize && box.y in 0 until boardSize
+    }
+
 }

@@ -8,4 +8,5 @@
     <string name="ok">Ok</string>
     <string name="invalid_config">Please enter number of moves(any) and board size to continue(from 6 to 16).</string>
     <string name="calculatePaths">Calc possible paths</string>
+    <string name="calculating">Calculating paths</string>
 </resources>

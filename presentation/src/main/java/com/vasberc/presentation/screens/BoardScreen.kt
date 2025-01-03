@@ -12,14 +12,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ContextualFlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -49,6 +52,8 @@ import com.vasberc.presentation.componets.BackgroundComposable
 import com.vasberc.presentation.componets.BottomSheet
 import com.vasberc.presentation.componets.clickableWithColor
 import com.vasberc.presentation.componets.dragAndDropTargetElement
+import com.vasberc.presentation.uimodels.Board
+import com.vasberc.presentation.uimodels.Box
 import com.vasberc.presentation.uimodels.SessionConfig
 import com.vasberc.presentation.uimodels.SnackbarMessage
 import com.vasberc.presentation.viewmodels.BoardScreenViewModel
@@ -62,12 +67,15 @@ fun BoardScreen(
 ) {
 
     val sessionConfig = viewModel.sessionConfig.collectAsStateWithLifecycle().value
+    val calculating = viewModel.calculating.collectAsStateWithLifecycle().value
 
     BoardScreenContent(
         sessionConfig = sessionConfig,
+        calculating = calculating,
         onBoxClicked = viewModel::onBoxClicked,
         onItemDropped = viewModel::onItemDropped,
-        onConfigComplete = viewModel::setSessionConfig
+        onConfigComplete = viewModel::setSessionConfig,
+        onCalculateClicked = viewModel::onCalculateClicked
     )
 }
 
@@ -75,9 +83,11 @@ fun BoardScreen(
 @Composable
 fun BoardScreenContent(
     sessionConfig: SessionConfig?,
+    calculating: Boolean,
     onBoxClicked: (index: Int) -> Unit,
     onItemDropped: (index: Int, isHorse: Boolean) -> Unit,
-    onConfigComplete: (sessionConfig: SessionConfig) -> Unit
+    onConfigComplete: (sessionConfig: SessionConfig) -> Unit,
+    onCalculateClicked: () -> Unit
 ) {
     if (sessionConfig == null) {
         BottomSheet(onConfigComplete)
@@ -89,6 +99,8 @@ fun BoardScreenContent(
                 .fillMaxSize()
         ) {
             val (board, calcButton) = createRefs()
+            val verticalScrollState = rememberScrollState()
+            val horizontalScrollState = rememberScrollState()
 
             ContextualFlowRow(
                 itemCount = sessionConfig.board.boxes.size,
@@ -105,8 +117,8 @@ fun BoardScreenContent(
                         width = androidx.constraintlayout.compose.Dimension.fillToConstraints
                         height = androidx.constraintlayout.compose.Dimension.fillToConstraints
                     }
-                    .verticalScroll(rememberScrollState())
-                    .horizontalScroll(rememberScrollState())
+                    .verticalScroll(verticalScrollState)
+                    .horizontalScroll(horizontalScrollState)
             ) { index ->
 
                 var draggableBackground by remember {
@@ -164,6 +176,8 @@ fun BoardScreenContent(
                                         }
                                     )
                                 }
+
+
                         )
                     } else if (sessionConfig.board.target == box) {
                         Icon(
@@ -186,6 +200,8 @@ fun BoardScreenContent(
                                         }
                                     )
                                 }
+
+
                         )
                     }
                 }
@@ -199,9 +215,19 @@ fun BoardScreenContent(
                         end.linkTo(parent.end)
 
                     },
-                onClick = {}
+                enabled = sessionConfig.board.horse != null && sessionConfig.board.target != null,
+                onClick = onCalculateClicked
             ) {
-                Text(text = stringResource(R.string.calculatePaths))
+                if (calculating) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(10.dp),
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(text = stringResource(R.string.calculating))
+                } else {
+                    Text(text = stringResource(R.string.calculatePaths))
+                }
             }
         }
 
@@ -222,10 +248,13 @@ fun BoardScreenPreview() {
     ) {
         BackgroundComposable {
             BoardScreenContent(
-                sessionConfig = null,
+                sessionConfig = SessionConfig(Board(1, null, null, 8)),
+                calculating = true,
                 onBoxClicked = {},
                 onItemDropped = { i, b -> },
-                onConfigComplete = {})
+                onConfigComplete = {},
+                onCalculateClicked = {}
+            )
         }
     }
 }
