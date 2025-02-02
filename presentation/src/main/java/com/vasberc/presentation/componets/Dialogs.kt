@@ -3,6 +3,7 @@ package com.vasberc.presentation.componets
 import android.graphics.Paint
 import android.graphics.Paint.Align
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -35,7 +36,8 @@ fun PathsDialog(
     shape: Shape = Shapes().medium.copy(all = CornerSize(8.dp)),
     properties: DialogProperties = DialogProperties(),
     paths: List<List<Box>>,
-    isVisible: Boolean
+    isVisible: Boolean,
+    onPathClick: (List<Box>) -> Unit
 ) {
     if (isVisible) {
         Dialog(
@@ -63,7 +65,13 @@ fun PathsDialog(
                     items(paths.size, key = { paths[it].toString() }) { index ->
                         Text(
                             text = paths[index].toString().trim('[', ']'),
-                            modifier = Modifier.fillMaxWidth().background(Color.Gray, shape).padding(5.dp),
+                            modifier = Modifier.fillMaxWidth()
+                                .background(Color.Gray, shape)
+                                .padding(5.dp)
+                                .clickable {
+                                    onPathClick(paths[index])
+                                    onDismissRequest()
+                                },
                             color = Color.White
                         )
                         Spacer(modifier = Modifier.height(5.dp))
@@ -77,5 +85,5 @@ fun PathsDialog(
 @Composable
 @Preview
 fun PathsDialogPreview() {
-    PathsDialog(onDismissRequest = {}, isVisible = true, paths = listOf(listOf(Box(1, 2))))
+    PathsDialog(onDismissRequest = {}, isVisible = true, paths = listOf(listOf(Box(1, 2))), onPathClick = {})
 }
