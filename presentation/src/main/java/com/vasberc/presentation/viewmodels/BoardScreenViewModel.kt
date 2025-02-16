@@ -4,15 +4,20 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.vasberc.data_local.repo.SessionRepo
 import com.vasberc.presentation.navigation.ChessQuizRoutes.BoardScreen
 import com.vasberc.presentation.uimodels.Box
 import com.vasberc.presentation.uimodels.Horse
 import com.vasberc.presentation.uimodels.SessionConfig
+import com.vasberc.presentation.uimodels.asEntity
+import com.vasberc.presentation.uimodels.asSessionConfig
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
@@ -21,6 +26,7 @@ import java.util.LinkedList
 
 @KoinViewModel
 class BoardScreenViewModel(
+    private val sessionRepo: SessionRepo,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -40,11 +46,21 @@ class BoardScreenViewModel(
     private val _paths = MutableStateFlow<List<List<Box>>?>(null)
     val paths = _paths.asStateFlow()
 
+    private val list: LinkedList<Box> = LinkedList()
+
     val hasHorse: Boolean
         get() = _sessionConfig.value?.board?.horse != null
 
     val hasTarget: Boolean
         get() = _sessionConfig.value?.board?.target != null
+
+    init {
+        if (isResume) {
+            viewModelScope.launch {
+                _sessionConfig.update { sessionRepo.getSession().first()?.asSessionConfig() }
+            }
+        }
+    }
 
     fun setSessionConfig(config: SessionConfig) {
         _sessionConfig.value = config
@@ -166,8 +182,6 @@ class BoardScreenViewModel(
         }
     }
 
-    val list: LinkedList<Box> = LinkedList()
-
     fun onPathClicked(path: List<Box>) {
         selectedPath = path
         list.clear()
@@ -215,6 +229,15 @@ class BoardScreenViewModel(
                 selectedPath = null
             }
         }
+    }
+
+    override fun onCleared() {
+        _sessionConfig.value?.let {
+            CoroutineScope(Dispatchers.IO).launch {
+                sessionRepo.insertSession(it.asEntity())
+            }
+        }
+        super.onCleared()
     }
 }
 
