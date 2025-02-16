@@ -6,7 +6,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.draganddrop.dragAndDropSource
-import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -28,23 +27,23 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draganddrop.DragAndDropEvent
-import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.DragAndDropTransferData
-import androidx.compose.ui.draganddrop.toAndroidDragEvent
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -53,8 +52,11 @@ import com.vasberc.presentation.componets.BackgroundComposable
 import com.vasberc.presentation.componets.BottomSheet
 import com.vasberc.presentation.componets.PathsDialog
 import com.vasberc.presentation.componets.TextWithAnimatedRing
+import com.vasberc.presentation.componets.moveHorseToBox
 import com.vasberc.presentation.componets.clickableWithColor
 import com.vasberc.presentation.componets.dragAndDropTargetElement
+import com.vasberc.presentation.componets.keepOnScreen
+import com.vasberc.presentation.componets.zIndexOfBox
 import com.vasberc.presentation.uimodels.Board
 import com.vasberc.presentation.uimodels.Box
 import com.vasberc.presentation.uimodels.SessionConfig
@@ -72,6 +74,7 @@ fun BoardScreen(
     val sessionConfig = viewModel.sessionConfig.collectAsStateWithLifecycle().value
     val calculating = viewModel.calculating.collectAsStateWithLifecycle().value
     val possiblePaths = viewModel.paths.collectAsStateWithLifecycle().value
+    val movingToBox = viewModel.movingToBox.collectAsStateWithLifecycle().value
 
     BoardScreenContent(
         sessionConfig = sessionConfig,
@@ -80,7 +83,10 @@ fun BoardScreen(
         onItemDropped = viewModel::onItemDropped,
         onConfigComplete = viewModel::setSessionConfig,
         onCalculateClicked = viewModel::onCalculateClicked,
-        possiblePaths = possiblePaths
+        possiblePaths = possiblePaths,
+        onPathClick = viewModel::onPathClicked,
+        movingToBox = movingToBox,
+        onHorseMoved = viewModel::onHorseMoved
     )
 }
 
@@ -93,7 +99,10 @@ fun BoardScreenContent(
     onItemDropped: (index: Int, isHorse: Boolean) -> Unit,
     onConfigComplete: (sessionConfig: SessionConfig) -> Unit,
     onCalculateClicked: () -> Unit,
-    possiblePaths: List<List<Box>>?
+    possiblePaths: List<List<Box>>?,
+    onPathClick: (path: List<Box>) -> Unit,
+    movingToBox: Box?,
+    onHorseMoved: (box: Box?) -> Unit
 ) {
     if (sessionConfig == null) {
         BottomSheet(onConfigComplete)
@@ -108,6 +117,7 @@ fun BoardScreenContent(
             val verticalScrollState = rememberScrollState()
             val horizontalScrollState = rememberScrollState()
             var dialogVisible by remember { mutableStateOf(false) }
+            var boardCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
 
             ContextualFlowRow(
                 itemCount = sessionConfig.board.boxes.size,
@@ -124,6 +134,9 @@ fun BoardScreenContent(
                         width = androidx.constraintlayout.compose.Dimension.fillToConstraints
                         height = androidx.constraintlayout.compose.Dimension.fillToConstraints
                     }
+                    .onGloballyPositioned { layoutCoordinates ->
+                        boardCoordinates = layoutCoordinates
+                    }
                     .verticalScroll(verticalScrollState)
                     .horizontalScroll(horizontalScrollState)
             ) { index ->
@@ -133,8 +146,13 @@ fun BoardScreenContent(
                 }
 
                 val box = sessionConfig.board.boxes[index]
+
                 Box(
                     modifier = Modifier
+                        .zIndexOfBox(
+                            box = box,
+                            sessionConfig = sessionConfig
+                        )
                         .size(100.dp)
                         .background(
                             draggableBackground ?: if (box.isDark) Color.Black else Color.White
@@ -163,11 +181,22 @@ fun BoardScreenContent(
                         )
                 ) {
                     if (sessionConfig.board.horse?.position == box) {
+
+                        val moving by remember(movingToBox) { mutableStateOf(movingToBox != null) }
+
                         Image(
                             painter = painterResource(R.drawable.ic_chess_knight_horse),
                             contentDescription = "",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
+                                .moveHorseToBox(
+                                    enabled = moving,
+                                    targetBox = movingToBox,
+                                    currentBox = box,
+                                    onFinished = {
+                                        onHorseMoved(it)
+                                    }
+                                )
                                 .fillMaxSize()
                                 .dragAndDropSource {
                                     detectTapGestures(
@@ -183,8 +212,12 @@ fun BoardScreenContent(
                                         }
                                     )
                                 }
-
-
+                                .keepOnScreen(
+                                    scrollViewCoordinates = boardCoordinates,
+                                    horizontalScrollState = horizontalScrollState,
+                                    verticalScrollState = verticalScrollState,
+                                    enabled = moving
+                                )
                         )
                     } else if (sessionConfig.board.target == box) {
                         Icon(
@@ -223,7 +256,10 @@ fun BoardScreenContent(
                     end.linkTo(board.end)
                 }
             ) {
-                TextWithAnimatedRing(counter = possiblePaths?.size ?: 0, calculating = calculating) {
+                TextWithAnimatedRing(
+                    counter = possiblePaths?.size ?: 0,
+                    calculating = calculating
+                ) {
                     if (!possiblePaths.isNullOrEmpty()) {
                         dialogVisible = true
                     }
@@ -256,7 +292,8 @@ fun BoardScreenContent(
             PathsDialog(
                 onDismissRequest = { dialogVisible = false },
                 paths = possiblePaths ?: listOf(),
-                isVisible = dialogVisible
+                isVisible = dialogVisible,
+                onPathClick = onPathClick
             )
         }
     }
@@ -282,7 +319,10 @@ fun BoardScreenPreview() {
                 onItemDropped = { i, b -> },
                 onConfigComplete = {},
                 onCalculateClicked = {},
-                possiblePaths = listOf()
+                possiblePaths = listOf(),
+                onPathClick = {},
+                movingToBox = null,
+                onHorseMoved = {}
             )
         }
     }

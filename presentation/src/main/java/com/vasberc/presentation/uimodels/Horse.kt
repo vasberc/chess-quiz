@@ -1,5 +1,7 @@
 package com.vasberc.presentation.uimodels
 
+import kotlin.math.abs
+
 data class Horse(
     val position: Box
 ) {
@@ -19,6 +21,36 @@ data class Horse(
 
     fun move(to: Box): Horse {
         return Horse(position = to)
+    }
+
+    companion object {
+        fun findBoxesPath(from: Box, to: Box): Array<Box> {
+            val path = Array<Box>(3) { Box(-1, -1) }
+            val shouldStartX = abs(from.x - to.x) == 2
+            val shouldGoRight = from.x - to.x < 0
+            val shouldGoDown = from.y - to.y < 0
+            if (shouldStartX) {
+                if (shouldGoRight) {
+                    path[0] = HorseMovement.RIGHT.move(from)
+                    path[1] = HorseMovement.RIGHT.move(path[0])
+                } else {
+                    path[0] = HorseMovement.LEFT.move(from)
+                    path[1] = HorseMovement.LEFT.move(path[0])
+
+                }
+                path[2] = if (shouldGoDown) HorseMovement.DOWN.move(path[1]) else HorseMovement.UP.move(path[1])
+            } else {
+                if (shouldGoDown) {
+                    path[0] = HorseMovement.DOWN.move(from)
+                    path[1] = HorseMovement.DOWN.move(path[0])
+                } else {
+                    path[0] = HorseMovement.UP.move(from)
+                    path[1] = HorseMovement.UP.move(path[0])
+                }
+                path[2] = if (shouldGoRight) HorseMovement.RIGHT.move(path[1]) else HorseMovement.LEFT.move(path[1])
+            }
+            return path
+        }
     }
 }
 
