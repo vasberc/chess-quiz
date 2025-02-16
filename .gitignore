@@ -14,6 +14,7 @@
 .cxx
 local.properties
 /.idea/
+/.kotlin/
 app/build
 presentation/build
 data_local/build
