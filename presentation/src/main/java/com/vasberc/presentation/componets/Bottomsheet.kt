@@ -11,9 +11,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -42,18 +44,23 @@ fun BottomSheet(
     val scope = rememberCoroutineScope()
     var moves by remember { mutableIntStateOf(-1) }
     var boardSize by remember { mutableIntStateOf(-1) }
-    val validValues = remember {
+    val validValues by remember {
         derivedStateOf {
             moves > 0 && boardSize >=6 && boardSize <= 16
         }
     }
-    val sheetState = rememberModalBottomSheetState { validValues.value }
+    val sheetState = rememberModalBottomSheetState {
+        return@rememberModalBottomSheetState when (it) {
+            SheetValue.Expanded -> true
+            SheetValue.Hidden -> false
+            SheetValue.PartiallyExpanded -> true
+        }
+    }
 
     ModalBottomSheet(
-        onDismissRequest = {
-        },
+        onDismissRequest = {},
         sheetState = sheetState,
-        properties = ModalBottomSheetProperties(false)
+        properties = ModalBottomSheetProperties(false, false)
     ) {
         Column(
             modifier = Modifier
@@ -80,7 +87,7 @@ fun BottomSheet(
                 label = { Text(stringResource(R.string.insert_max_moves)) })
             Spacer(Modifier.height(5.dp))
             OutlinedTextField(
-                isError = boardSize < 6 || boardSize > 16,
+                isError = boardSize !in 6..16,
                 value = boardSize.takeUnless { it == -1 }?.toString() ?: "",
                 onValueChange = {
                     if (it.isEmpty() && boardSize != -1) {
@@ -91,7 +98,7 @@ fun BottomSheet(
                 },
                 label = { Text(stringResource(R.string.insert_board_size)) })
             Spacer(Modifier.height(5.dp))
-            if (!validValues.value) {
+            if (!validValues) {
                 Text(
                     stringResource(R.string.invalid_config),
                     fontSize = 12.sp,
@@ -104,7 +111,7 @@ fun BottomSheet(
             Button(
                 modifier = Modifier.align(Alignment.End),
                 onClick = {
-                    if (validValues.value) {
+                    if (validValues) {
                         scope.launch {
                             sheetState.hide()
                             onButtonPress(
@@ -126,6 +133,12 @@ fun BottomSheet(
                 Spacer(modifier = Modifier.width(5.dp))
             }
             Spacer(Modifier.height(5.dp))
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        scope.launch {
+            sheetState.show()
         }
     }
 }

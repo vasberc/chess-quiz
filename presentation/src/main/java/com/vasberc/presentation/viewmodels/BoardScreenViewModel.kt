@@ -67,9 +67,7 @@ class BoardScreenViewModel(
     }
 
     fun onBoxClicked(index: Int) {
-        val sessionConfig = _sessionConfig.value
-
-        if (sessionConfig == null) return
+        val sessionConfig = _sessionConfig.value ?: return
 
         _sessionConfig.update {
             when {

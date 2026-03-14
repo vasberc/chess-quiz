@@ -6,7 +6,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.draganddrop.dragAndDropSource
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,7 +41,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -52,10 +49,10 @@ import com.vasberc.presentation.componets.BackgroundComposable
 import com.vasberc.presentation.componets.BottomSheet
 import com.vasberc.presentation.componets.PathsDialog
 import com.vasberc.presentation.componets.TextWithAnimatedRing
-import com.vasberc.presentation.componets.moveHorseToBox
 import com.vasberc.presentation.componets.clickableWithColor
 import com.vasberc.presentation.componets.dragAndDropTargetElement
 import com.vasberc.presentation.componets.keepOnScreen
+import com.vasberc.presentation.componets.moveHorseToBox
 import com.vasberc.presentation.componets.zIndexOfBox
 import com.vasberc.presentation.uimodels.Board
 import com.vasberc.presentation.uimodels.Box
@@ -71,10 +68,10 @@ fun BoardScreen(
     viewModel: BoardScreenViewModel = koinViewModel()
 ) {
 
-    val sessionConfig = viewModel.sessionConfig.collectAsStateWithLifecycle().value
-    val calculating = viewModel.calculating.collectAsStateWithLifecycle().value
-    val possiblePaths = viewModel.paths.collectAsStateWithLifecycle().value
-    val movingToBox = viewModel.movingToBox.collectAsStateWithLifecycle().value
+    val sessionConfig by viewModel.sessionConfig.collectAsStateWithLifecycle()
+    val calculating by viewModel.calculating.collectAsStateWithLifecycle()
+    val possiblePaths by viewModel.paths.collectAsStateWithLifecycle()
+    val movingToBox by viewModel.movingToBox.collectAsStateWithLifecycle()
 
     BoardScreenContent(
         sessionConfig = sessionConfig,
@@ -105,7 +102,9 @@ fun BoardScreenContent(
     onHorseMoved: (box: Box?) -> Unit
 ) {
     if (sessionConfig == null) {
-        BottomSheet(onConfigComplete)
+        Box(modifier = Modifier.fillMaxSize()) {
+            BottomSheet(onConfigComplete)
+        }
     } else {
         ConstraintLayout(
             modifier = Modifier
@@ -160,8 +159,8 @@ fun BoardScreenContent(
                         .clickableWithColor(
                             color = if (box.isDark) Color.White else Color.Black,
                             enabled =
-                            (sessionConfig.board.target == null || sessionConfig.board.horse == null) &&
-                                    sessionConfig.board.horse?.position != box && sessionConfig.board.target != box
+                                (sessionConfig.board.target == null || sessionConfig.board.horse == null) &&
+                                        sessionConfig.board.horse?.position != box && sessionConfig.board.target != box
                         ) {
                             onBoxClicked(index)
                         }
@@ -198,18 +197,12 @@ fun BoardScreenContent(
                                     }
                                 )
                                 .fillMaxSize()
-                                .dragAndDropSource {
-                                    detectTapGestures(
-                                        onLongPress = {
-                                            startTransfer(
-                                                DragAndDropTransferData(
-                                                    ClipData.newPlainText(
-                                                        "object",
-                                                        sessionConfig.board.horse.toString()
-                                                    )
-                                                )
-                                            )
-                                        }
+                                .dragAndDropSource { _ ->
+                                    DragAndDropTransferData(
+                                        ClipData.newPlainText(
+                                            "object",
+                                            sessionConfig.board.horse.toString()
+                                        )
                                     )
                                 }
                                 .keepOnScreen(
@@ -226,22 +219,14 @@ fun BoardScreenContent(
                             tint = if (box.isDark) Color.White else Color.Black,
                             modifier = Modifier
                                 .fillMaxSize()
-                                .dragAndDropSource {
-                                    detectTapGestures(
-                                        onLongPress = {
-                                            startTransfer(
-                                                DragAndDropTransferData(
-                                                    ClipData.newPlainText(
-                                                        "object",
-                                                        sessionConfig.board.target.toString()
-                                                    )
-                                                )
-                                            )
-                                        }
+                                .dragAndDropSource { _ ->
+                                    DragAndDropTransferData(
+                                        ClipData.newPlainText(
+                                            "object",
+                                            sessionConfig.board.target.toString()
+                                        )
                                     )
                                 }
-
-
                         )
                     }
                 }
